@@ -1,0 +1,60 @@
+#ifndef _DBG_
+#define _DBG_
+
+forward(dbg)
+
+#define cursor_schema(C,S,...)\
+    M(C,S, opaque, prop, dbg,   debug) \
+    M(C,S, public, prop, path,  source) \
+    M(C,S, public, prop, u32,   line)   \
+    M(C,S, public, prop, u32,   column)
+declare_class(cursor)
+
+#define variable_schema(C,S,...)\
+    M(C,S, opaque, prop, dbg,      debug)  \
+    M(C,S, public, prop, string,   name)   \
+    M(C,S, public, prop, string,   type)   \
+    M(C,S, public, prop, string,   value)  \
+    M(C,S, public, prop, array,    children)
+declare_class(variable)
+
+#define exited_schema(C,S,...)\
+    M(C,S, opaque, prop, dbg,   debug) \
+    M(C,S, public, prop, i32,   code)
+declare_class(exited)
+
+#define dbg_schema(C,S,...) \
+    M(C,S, public, prop,   path,   location) \
+    M(C,S, public, prop,   cursor, cursor) \
+    M(C,S, public, prop,   hook,   on_break) \
+    M(C,S, public, prop,   hook,   on_exit) \
+    M(C,S, public, prop,   hook,   on_crash) \
+    M(C,S, public, prop,   bool,   auto_start) \
+    M(C,S, public, prop,   bool,   exceptions) \
+    M(C,S, public, prop,   bool,   running) \
+    M(C,S, public, prop,   async,  poll) \
+    M(C,S, intern, prop,   bool,   active) \
+    \
+    i_prop(C,S, intern, lldb::SBDebugger, lldb_debugger, as, ARef) \
+    i_prop(C,S, intern, lldb::SBTarget,   lldb_target,   as, ARef) \
+    i_prop(C,S, intern, lldb::SBProcess,  lldb_process,  as, ARef) \
+    i_prop(C,S, intern, lldb::SBListener, lldb_listener, as, ARef) \
+    \
+    i_method(C,S, public, none,   step_into) \
+    i_method(C,S, public, none,   step_over) \
+    i_method(C,S, public, none,   step_out) \
+    i_method(C,S, public, none,   pause) \
+    i_method(C,S, public, none,   cont) \
+    i_method(C,S, public, none,   start) \
+    i_method(C,S, public, none,   stop) \
+    i_method(C,S, public, array,  read_arguments) \
+    i_method(C,S, public, array,  read_locals) \
+    i_method(C,S, public, array,  read_statics) \
+    i_method(C,S, public, array,  read_globals) \
+    i_method(C,S, public, array,  read_registers) \
+    \
+    M(C,S, method, override, init) \
+    M(C,S, method, override, dealloc)
+declare_class(dbg)
+
+#endif
