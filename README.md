@@ -1,7 +1,7 @@
 # dbg component (A-type, universal object for C or C++)
-- a simple basic debugger using LLDB api; accessed by universal object or flat C-api
+- componentized debugger using LLDB api; accessed by universal object
 
-# here is an example using it with A-type objects
+# example use-case
 ```c
 #include <dbg>
 
@@ -24,7 +24,6 @@ int main(int argc, symbol argv[]) {
 		usleep(1000000);
 	}
 }
-
 ```
 
 orbiter
