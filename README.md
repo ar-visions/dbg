@@ -5,8 +5,7 @@
 ```c
 #include <dbg>
 
-object on_break(dbg debug, path source, i32 line, i32 column) {
-	// column is -1 if we do not have this information
+object on_break(dbg debug, path source, u32 line, u32 column) {
 	print("breakpoint hit on %o:%i:%i", source, line, column);
 	print("arguments: %o ... locals: %o ... statics: %o ... globals: %o ... registers: %o ... this/self: %o", 
 	cont(debug);
