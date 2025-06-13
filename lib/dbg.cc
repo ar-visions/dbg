@@ -7,7 +7,6 @@
 
 object dbg_io(dbg debug) {
     lldb::SBEvent event;
-    AF            af     = A_pool(1024);
     int           fd_out = open(debug->stdout_fifo->chars, O_RDONLY | O_NONBLOCK);
     int           fd_err = open(debug->stderr_fifo->chars, O_RDONLY | O_NONBLOCK);
     fd_set        readfds;
@@ -16,8 +15,6 @@ object dbg_io(dbg debug) {
     debug->fifo_fd_err = fd_err;
 
     while (debug->active) {
-        auto_free();
-
         FD_ZERO(&readfds);
         FD_SET(fd_out, &readfds);
         FD_SET(fd_err, &readfds);
@@ -47,9 +44,7 @@ object dbg_io(dbg debug) {
 
 object dbg_poll(dbg debug) {
     lldb::SBEvent event;
-    AF af = A_pool(1024);
     while (debug->active) {
-        auto_free();
         if (!debug->running) {
             usleep(1000);
             continue;
@@ -102,7 +97,6 @@ object dbg_poll(dbg debug) {
             debug->on_exit((object)e);
         }
     }
-    drop(af);
     return null;
 }
 
