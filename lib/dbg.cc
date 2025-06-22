@@ -26,14 +26,14 @@ object dbg_io(dbg debug) {
             if (FD_ISSET(fd_out, &readfds)) {
                 ssize_t n = read(fd_out, buffer, sizeof(buffer));
                 if (n > 0)
-                    debug->on_stdout(
+                    debug->on_stdout(debug->target,
                         (object)iobuffer(debug, debug, bytes, buffer, count, n));
             }
 
             if (FD_ISSET(fd_err, &readfds)) {
                 ssize_t n = read(fd_err, buffer, sizeof(buffer));
                 if (n > 0)
-                    debug->on_stderr(
+                    debug->on_stderr(debug->target,
                         (object)iobuffer(debug, debug, bytes, buffer, count, n));
             }
         } else if (ready < 0)
@@ -77,7 +77,7 @@ object dbg_poll(dbg debug) {
                 source, source,
                 line,   line,
                 column, column);
-            debug->on_break((object)cur);
+            debug->on_break(debug->target, (object)cur);
             
         } else if (state == lldb::eStateCrashed) {
             debug->running = false;
@@ -86,7 +86,7 @@ object dbg_poll(dbg debug) {
                 source, source,
                 line,   line,
                 column, column);
-            debug->on_crash((object)cur);
+            debug->on_crash(debug->target, (object)cur);
 
         } else if (state == lldb::eStateExited) {
             debug->running = false;
@@ -94,7 +94,7 @@ object dbg_poll(dbg debug) {
             exited e = exited(
                 debug,  debug,
                 code,   exit_code);
-            debug->on_exit((object)e);
+            debug->on_exit(debug->target, (object)e);
         }
     }
     return null;
@@ -108,10 +108,11 @@ none dbg_init(dbg debug) {
     }
     debug->lldb_debugger = lldb::SBDebugger::Create();
 
-    int sz0 = sizeof(lldb::SBDebugger);
-    int sz1 = sizeof(lldb::SBTarget);
-    int sz2 = sizeof(lldb::SBProcess);
-    int sz3 = sizeof(lldb::SBListener);
+    if (!debug->on_stdout) debug->on_stdout = bind(debug, (A)debug->target, true, typeid(object), typeid(iobuffer), "stdout");
+    if (!debug->on_stderr) debug->on_stderr = bind(debug, (A)debug->target, true, typeid(object), typeid(iobuffer), "stderr");
+    if (!debug->on_break)  debug->on_break  = bind(debug, (A)debug->target, true, typeid(object), typeid(cursor),   "break");
+    if (!debug->on_exit)   debug->on_exit   = bind(debug, (A)debug->target, true, typeid(object), typeid(dbg),      "exit");
+    if (!debug->on_crash)  debug->on_crash  = bind(debug, (A)debug->target, true, typeid(object), typeid(cursor),   "crash");
 
     debug->lldb_debugger.SetAsync(true);
     if (!debug->exceptions) {
@@ -119,6 +120,7 @@ none dbg_init(dbg debug) {
         lldb::SBCommandReturnObject result;
         interp.HandleCommand("settings set target.exception-breakpoints.* false", result);
     }
+
     debug->lldb_listener = debug->lldb_debugger.GetListener();
     debug->lldb_target   = debug->lldb_debugger.CreateTarget(debug->location->chars);
     debug->running       = false;
@@ -297,14 +299,15 @@ array dbg_read_registers(dbg debug) {
 }
 
 breakpoint dbg_set_breakpoint(dbg debug, path source, u32 line, u32 column) {
+    A src_head = head(source);
     lldb::SBTarget target = debug->lldb_target;
     lldb::SBBreakpoint bp = target.BreakpointCreateByLocation(source->chars, line);
 
-    if (bp.IsValid()) {
+    if (bp.IsValid())
         print("breakpoint set: %s:%i id=%i", source->chars, line, (i32)bp.GetID());
-    } else {
+    else
         print("failed to set breakpoint: %s:%i", source->chars, line);
-    }
+    
     breakpoint br = breakpoint(debug, debug, lldb_bp, bp);
     return br;
 }

@@ -42,11 +42,12 @@ typedef char ARef24[24];
 #define dbg_schema(C,S,...) \
     M(C,S, public, prop,   path,   location) \
     M(C,S, public, prop,   cursor, cursor) \
-    M(C,S, required, prop,   hook,   on_stdout) \
-    M(C,S, required, prop,   hook,   on_stderr) \
-    M(C,S, required, prop,   hook,   on_break) \
-    M(C,S, required, prop,   hook,   on_exit) \
-    M(C,S, required, prop,   hook,   on_crash) \
+    M(C,S, required, prop,   object,     target) \
+    M(C,S, public, prop,   callback,   on_stdout) \
+    M(C,S, public, prop,   callback,   on_stderr) \
+    M(C,S, public, prop,   callback,   on_break) \
+    M(C,S, public, prop,   callback,   on_exit) \
+    M(C,S, public, prop,   callback,   on_crash) \
     M(C,S, public, prop,   bool,   auto_start) \
     M(C,S, public, prop,   bool,   exceptions) \
     M(C,S, public, prop,   bool,   running) \
