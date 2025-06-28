@@ -108,11 +108,11 @@ none dbg_init(dbg debug) {
     }
     debug->lldb_debugger = lldb::SBDebugger::Create();
 
-    if (!debug->on_stdout) debug->on_stdout = bind(debug, (A)debug->target, true, typeid(object), typeid(iobuffer), "stdout");
-    if (!debug->on_stderr) debug->on_stderr = bind(debug, (A)debug->target, true, typeid(object), typeid(iobuffer), "stderr");
-    if (!debug->on_break)  debug->on_break  = bind(debug, (A)debug->target, true, typeid(object), typeid(cursor),   "break");
-    if (!debug->on_exit)   debug->on_exit   = bind(debug, (A)debug->target, true, typeid(object), typeid(dbg),      "exit");
-    if (!debug->on_crash)  debug->on_crash  = bind(debug, (A)debug->target, true, typeid(object), typeid(cursor),   "crash");
+    if (!debug->on_stdout) debug->on_stdout = bind(debug, (A)debug->target, true, typeid(object), typeid(iobuffer), null, "stdout");
+    if (!debug->on_stderr) debug->on_stderr = bind(debug, (A)debug->target, true, typeid(object), typeid(iobuffer), null, "stderr");
+    if (!debug->on_break)  debug->on_break  = bind(debug, (A)debug->target, true, typeid(object), typeid(cursor),   null, "break");
+    if (!debug->on_exit)   debug->on_exit   = bind(debug, (A)debug->target, true, typeid(object), typeid(dbg),      null, "exit");
+    if (!debug->on_crash)  debug->on_crash  = bind(debug, (A)debug->target, true, typeid(object), typeid(cursor),   null, "crash");
 
     debug->lldb_debugger.SetAsync(true);
     if (!debug->exceptions) {
